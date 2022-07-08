@@ -8,8 +8,8 @@ from pathlib import Path
 from datetime import datetime, timedelta
 
 # Create the srt subtitles file
-def make_srt() -> int:
-  lines = open("input.txt", "r").readlines()
+def make_srt(text_path: str) -> int:
+  lines = open(text_path, "r").readlines()
   seconds = 0
   text = ""
   subs = []
@@ -39,15 +39,24 @@ def get_duration(path: str) -> int:
 
 # Main function
 def main() -> None:
-  if len(sys.argv) != 2:
+  if len(sys.argv) != 3:
     return
 
-  # Only argument
+  # Arguments
   video_path = sys.argv[1]
+  text_path = sys.argv[2]
+
+  if not os.path.exists(video_path):
+    print("Invalid video path.")
+    exit(1)
+
+  if not os.path.exists(text_path):
+    print("Invalid text path.")
+    exit(1)
 
   # Generate subtitles
   # And get their duration
-  duration = make_srt()
+  duration = make_srt(text_path)
 
   # Check original video duration
   max_duration = get_duration(video_path)
