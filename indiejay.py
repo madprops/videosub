@@ -21,8 +21,15 @@ def make_srt(text_path: str) -> int:
     # Generate using srt library
     start = timedelta(seconds=seconds)
     end = timedelta(seconds=seconds + line_duration)
+    
+    # Create a subtitle item using the srt library
     subs.append(Subtitle(index=i + 1, start=start, end=end, content=line))
-    seconds += line_duration + 0.5
+    
+    # Increase seconds used
+    seconds += line_duration
+    # Add a gap between lines
+    if i < len(lines) - 1:
+      seconds += 0.5
   
   # Save srt file to table
   f = open("table/subtitles.srt", "w")
