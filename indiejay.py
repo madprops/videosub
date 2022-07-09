@@ -20,13 +20,13 @@ def clean_path(path: str) -> str:
 # Create the srt subtitles file
 def make_srt(text_path: str) -> int:
   lines = open(text_path, "r").readlines()
-  seconds = 0
+  seconds = 0.5
   text = ""
   subs = []
 
   for i, line in enumerate(lines):
     # Line duration based on char length
-    line_duration = max(len(line) * 0.1, 1)
+    line_duration = max(len(line) * 0.08, 1)
 
     # Generate using srt library
     start = timedelta(seconds=seconds)
