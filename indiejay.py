@@ -7,6 +7,13 @@ from srt import Subtitle, compose
 from pathlib import Path
 from datetime import datetime, timedelta
 
+# Path where there script is
+dirname: str
+
+# Remove unecessary characters
+def clean_path(path: str) -> str:
+  return path.rstrip("/")
+
 # Create the srt subtitles file
 def make_srt(text_path: str) -> int:
   lines = open(text_path, "r").readlines()
@@ -32,7 +39,7 @@ def make_srt(text_path: str) -> int:
       seconds += 0.5
   
   # Save srt file to table
-  f = open("table/subtitles.srt", "w")
+  f = open(f"{dirname}/table/subtitles.srt", "w")
   f.write(compose(subs))
   f.close()
 
@@ -40,18 +47,23 @@ def make_srt(text_path: str) -> int:
 
 # Get video duration
 def get_duration(path: str) -> int:
-  d = subprocess.check_output(['ffprobe', '-i', path, '-show_entries', 'format=duration', '-v', 'quiet', '-of', 'csv=%s' % ("p=0")])
+  d = subprocess.check_output(['ffprobe', '-i', path, '-show_entries', \
+  'format=duration', '-v', 'quiet', '-of', 'csv=%s' % ("p=0")])
   d = d.decode("utf-8").strip()
   return int(float(d))  
 
 # Main function
 def main() -> None:
+  global dirname
+
   if len(sys.argv) != 3:
     return
 
   # Arguments
   video_path = sys.argv[1]
   text_path = sys.argv[2]
+
+  dirname = clean_path(os.path.dirname(sys.argv[0]))
 
   if not os.path.exists(video_path):
     print("Invalid video path.")
@@ -68,16 +80,15 @@ def main() -> None:
   # Check original video duration
   max_duration = get_duration(video_path)
 
-  if max_duration < duration:
-    print("Video is too short.")
-    exit(1)
+  # Duration to use
+  d = min(duration, max_duration)
 
   # Get a random start position
-  start = random.randint(0, max_duration - duration)
+  start = random.randint(0, max_duration - d)
   ext = Path(video_path).suffix
   
   # Create slice from original video
-  os.popen(f"ffmpeg -y -ss {start} -t {duration} -i {video_path} -c copy table/clip{ext}").read()
+  os.popen(f"ffmpeg -y -ss {start} -t {d} -i {video_path} -c copy {dirname}/table/clip{ext}").read()
   
   # Unix seconds
   now = int(datetime.now().timestamp())
@@ -86,7 +97,9 @@ def main() -> None:
   style = "force_style='BackColour=&H80000000,BorderStyle=4,Fontsize=15'"
   
   # Mix clip with subtitles
-  os.popen(f"ffmpeg -y -i table/clip{ext} -filter_complex \"subtitles=table/subtitles.srt:{style}\" -ss 0 -t {duration} table/out_{now}{ext}").read() 
+  os.popen(f"ffmpeg -y -i {dirname}/table/clip{ext} -filter_complex \
+  \"subtitles={dirname}/table/subtitles.srt:{style}\" \
+  -ss 0 -t {d} {dirname}/table/out_{now}{ext}").read() 
   print("Done.")
   
 # Program starts here
