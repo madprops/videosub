@@ -12,4 +12,4 @@ Then add the subtitles to the slice.
 
 The output video is saved in /table.
 
-(It relies in ffmpeg and the srt python library)
+(It relies on ffmpeg and the srt python library)
