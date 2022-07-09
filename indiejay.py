@@ -66,7 +66,7 @@ def main() -> None:
   video_path = sys.argv[1]
   text_path = sys.argv[2]
 
-  dirname = clean_path(os.path.dirname(sys.argv[0]))
+  dirname = clean_path(os.path.dirname(os.path.realpath(__file__)))
 
   if not os.path.exists(video_path):
     print("Invalid video path.")
