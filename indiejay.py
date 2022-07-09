@@ -1,3 +1,6 @@
+# pip install srt
+# Hint: use fc-scan to get the fullname of font files
+
 import os
 import sys
 import subprocess
@@ -88,7 +91,7 @@ def main() -> None:
   ext = Path(video_path).suffix
   
   # Create slice from original video
-  os.popen(f"ffmpeg -y -ss {start} -t {d} -i {video_path} -c copy {dirname}/table/clip{ext}").read()
+  os.popen(f"ffmpeg -y -ss {start} -t {d} -i '{video_path}' -c copy {dirname}/table/clip{ext}").read()
   
   # Unix seconds
   now = int(datetime.now().timestamp())
