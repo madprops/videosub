@@ -83,7 +83,7 @@ def main() -> None:
   now = int(datetime.now().timestamp())
 
   # Subtitles style
-  style = "force_style='BackColour=&H80000000,BorderStyle=4,Fontsize=14'"
+  style = "force_style='BackColour=&H80000000,BorderStyle=4,Fontsize=15'"
   
   # Mix clip with subtitles
   os.popen(f"ffmpeg -y -i table/clip{ext} -filter_complex \"subtitles=table/subtitles.srt:{style}\" -ss 0 -t {duration} table/out_{now}{ext}").read() 
