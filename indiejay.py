@@ -6,6 +6,7 @@ import sys
 import subprocess
 import random
 import math
+import time
 from srt import Subtitle, compose
 from pathlib import Path
 from datetime import datetime, timedelta
@@ -75,6 +76,8 @@ def main() -> None:
   if not os.path.exists(text_path):
     print("Invalid text path.")
     exit(1)
+  
+  time_start = time.time()
 
   # Generate subtitles
   # And get their duration
@@ -85,6 +88,8 @@ def main() -> None:
 
   # Get a random start position
   start = random.randint(0, max_duration)
+
+  # Get file extension
   ext = Path(video_path).suffix
   
   # Create slice from original video
@@ -100,7 +105,10 @@ def main() -> None:
   os.popen(f"ffmpeg -y -stream_loop -1 -i {dirname}/table/clip{ext} -filter_complex \
   \"subtitles={dirname}/table/subtitles.srt:fontsdir={dirname}/fonts:{style}\" \
   -ss 0 -t {duration} {dirname}/table/out_{now}{ext}").read() 
-  print("Done.")
+  
+  time_end = time.time()
+  diff = int(time_end - time_start)
+  print(f"\nDone in {diff} seconds.")
   
 # Program starts here
 if __name__ == "__main__": main()
