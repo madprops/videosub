@@ -83,15 +83,12 @@ def main() -> None:
   # Check original video duration
   max_duration = get_duration(video_path)
 
-  # Duration to use
-  d = min(duration, max_duration)
-
   # Get a random start position
-  start = random.randint(0, max_duration - d)
+  start = random.randint(0, max_duration)
   ext = Path(video_path).suffix
   
   # Create slice from original video
-  os.popen(f"ffmpeg -y -ss {start} -t {d} -i '{video_path}' -c copy {dirname}/table/clip{ext}").read()
+  os.popen(f"ffmpeg -y -ss {start} -t {duration} -i '{video_path}' -c copy {dirname}/table/clip{ext}").read()
   
   # Unix seconds
   now = int(datetime.now().timestamp())
@@ -100,9 +97,9 @@ def main() -> None:
   style = f"force_style='BackColour=&H80000000,BorderStyle=4,Fontsize=16,FontName=Roboto'"
   
   # Mix clip with subtitles
-  os.popen(f"ffmpeg -y -i {dirname}/table/clip{ext} -filter_complex \
+  os.popen(f"ffmpeg -y -stream_loop -1 -i {dirname}/table/clip{ext} -filter_complex \
   \"subtitles={dirname}/table/subtitles.srt:fontsdir={dirname}/fonts:{style}\" \
-  -ss 0 -t {d} {dirname}/table/out_{now}{ext}").read() 
+  -ss 0 -t {duration} {dirname}/table/out_{now}{ext}").read() 
   print("Done.")
   
 # Program starts here
