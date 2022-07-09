@@ -1,6 +1,6 @@
 Send it a video path and a path of a text file with some lines.
 
-It will generate the subtitles .srt files.
+It will generate the subtitles .srt file.
 
 Each line will add a bit to the duration depending on its length.
 
