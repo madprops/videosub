@@ -54,7 +54,9 @@ def make_srt(text_path: str) -> int:
     
     # Increase seconds used
     seconds += line_duration
+    
     # Add a gap between lines
+    # Unless it's the last item
     if i < len(lines) - 1:
       seconds += gap
   
