@@ -87,7 +87,7 @@ def main() -> None:
   max_duration = get_duration(video_path)
 
   # Get a random start position
-  start = random.randint(0, max_duration)
+  start = random.randint(0, max(0, max_duration - 1))
 
   # Get file extension
   ext = Path(video_path).suffix
