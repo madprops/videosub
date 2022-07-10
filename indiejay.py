@@ -98,13 +98,16 @@ def main() -> None:
   # Unix seconds
   now = int(datetime.now().timestamp())
 
+  # Get the output name
+  name = "".join(filter(str.isalnum, Path(video_path).name))[0:10] or "output"
+
   # Subtitles style
   style = f"force_style='BackColour=&H80000000,BorderStyle=4,Fontsize=16,FontName=Roboto'"
   
   # Mix clip with subtitles
   os.popen(f"ffmpeg -y -i {dirname}/table/clip{ext} -filter_complex \
   \"subtitles={dirname}/table/subtitles.srt:fontsdir={dirname}/fonts:{style}\" \
-  -ss 0 -t {duration} {dirname}/output/out_{now}{ext}").read() 
+  -ss 0 -t {duration} {dirname}/output/{name}_{now}{ext}").read() 
   
   time_end = time.time()
   diff = int(time_end - time_start)
