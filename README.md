@@ -14,4 +14,4 @@ Temporary files are stored in /table
 
 The output videos are saved in /output.
 
-(It relies on ffmpeg and the srt python library)
+ffmpeg needs to be installed.

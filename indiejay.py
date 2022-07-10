@@ -1,4 +1,3 @@
-# pip install srt
 # Hint: use fc-scan to get the fullname of font files
 
 import os
@@ -7,7 +6,6 @@ import subprocess
 import random
 import math
 import time
-from srt import Subtitle, compose
 from pathlib import Path
 from datetime import datetime, timedelta
 
@@ -18,33 +16,51 @@ dirname: str
 def clean_path(path: str) -> str:
   return path.rstrip("/")
 
+# To srt timestamp format
+def srt_timestamp(td):
+  hrs, secs_remainder = divmod(td.seconds, 3600)
+  hrs += td.days * 24
+  mins, secs = divmod(secs_remainder, 60)
+  msecs = td.microseconds // 1000
+  return "%02d:%02d:%02d,%03d" % (hrs, mins, secs, msecs)
+
 # Create the srt subtitles file
 def make_srt(text_path: str) -> int:
   lines = open(text_path, "r").readlines()
-  seconds = 0.5
-  text = ""
+
+  # Seconds used between subtitle items
+  gap = 0.5
+
+  # Higher = Longer item duration
+  weight = 0.088
+
+  seconds = gap
+  items = []
   subs = []
 
   for i, line in enumerate(lines):
-    # Line duration based on char length
-    line_duration = max(len(line) * 0.08, 1)
+    text = f"{i + 1}\n"
 
-    # Generate using srt library
-    start = timedelta(seconds=seconds)
-    end = timedelta(seconds=seconds + line_duration)
-    
-    # Create a subtitle item using the srt library
-    subs.append(Subtitle(index=i + 1, start=start, end=end, content=line))
+    # Line duration based on char length
+    line_duration = max(len(line) * weight, 1)
+
+    # Start and end timestamps
+    text += srt_timestamp(timedelta(seconds=seconds))
+    text += " --> "
+    text += srt_timestamp(timedelta(seconds=seconds + line_duration))
+    text += f"\n{line}"
+
+    items.append(text)
     
     # Increase seconds used
     seconds += line_duration
     # Add a gap between lines
     if i < len(lines) - 1:
-      seconds += 0.5
+      seconds += gap
   
   # Save srt file to table
   f = open(f"{dirname}/table/subtitles.srt", "w")
-  f.write(compose(subs))
+  f.write("\n".join(items))
   f.close()
 
   return int(math.ceil(seconds))
