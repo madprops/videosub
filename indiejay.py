@@ -99,7 +99,7 @@ def main() -> None:
   now = int(datetime.now().timestamp())
 
   # Get the output name
-  name = "".join(filter(str.isalnum, Path(video_path).name))[0:10] or "output"
+  name = "".join(filter(str.isalnum, Path(video_path).stem))[0:10] or "output"
 
   # Subtitles style
   style = f"force_style='BackColour=&H80000000,BorderStyle=4,Fontsize=16,FontName=Roboto'"
