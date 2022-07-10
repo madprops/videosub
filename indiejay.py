@@ -48,8 +48,11 @@ def make_srt(text_path: str) -> int:
     text += srt_timestamp(timedelta(seconds=seconds))
     text += " --> "
     text += srt_timestamp(timedelta(seconds=seconds + line_duration))
+    
+    # Text content
     text += f"\n{line}"
 
+    # Add to list to join later
     items.append(text)
     
     # Increase seconds used
