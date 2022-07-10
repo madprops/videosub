@@ -1,11 +1,12 @@
 # Hint: use fc-scan to get the fullname of font files
 
-import os
-import sys
-import subprocess
-import random
-import math
-import time
+from sys import argv
+from subprocess import check_output
+from random import randint
+from math import ceil
+from time import time
+from os import popen
+from os.path import dirname, realpath
 from pathlib import Path
 from datetime import datetime, timedelta
 
@@ -68,11 +69,11 @@ def make_srt(text_path: str) -> int:
   f.write("\n".join(items))
   f.close()
 
-  return int(math.ceil(seconds))
+  return int(ceil(seconds))
 
 # Get video duration
 def get_duration(path: str) -> int:
-  d = subprocess.check_output(['ffprobe', '-i', path, '-show_entries', \
+  d = check_output(['ffprobe', '-i', path, '-show_entries', \
   'format=duration', '-v', 'quiet', '-of', 'csv=%s' % ("p=0")])
   d = d.decode("utf-8").strip()
   return int(float(d))  
@@ -81,24 +82,24 @@ def get_duration(path: str) -> int:
 def main() -> None:
   global dirname
 
-  if len(sys.argv) != 3:
+  if len(argv) != 3:
     return
 
   # Arguments
-  video_path = sys.argv[1]
-  text_path = sys.argv[2]
+  video_path = argv[1]
+  text_path = argv[2]
 
-  dirname = clean_path(os.path.dirname(os.path.realpath(__file__)))
+  dirname = clean_path(dirname(realpath(__file__)))
 
-  if not os.path.exists(video_path):
+  if not Path(video_path).exists():
     print("Invalid video path.")
     exit(1)
 
-  if not os.path.exists(text_path):
+  if not Path(text_path).exists():
     print("Invalid text path.")
     exit(1)
   
-  time_start = time.time()
+  time_start = time()
 
   # Generate subtitles
   # And get their duration
@@ -108,13 +109,13 @@ def main() -> None:
   max_duration = get_duration(video_path)
 
   # Get a random start position
-  start = random.randint(0, max(0, max_duration - 1))
+  start = randint(0, max(0, max_duration - 1))
 
   # Get file extension
   ext = Path(video_path).suffix
   
   # Create slice from original video
-  os.popen(f"ffmpeg -y -stream_loop -1 -ss {start} -t {duration} -i '{video_path}' -c copy {dirname}/table/clip{ext}").read()
+  popen(f"ffmpeg -y -stream_loop -1 -ss {start} -t {duration} -i '{video_path}' -c copy {dirname}/table/clip{ext}").read()
   
   # Unix seconds
   now = int(datetime.now().timestamp())
@@ -126,11 +127,11 @@ def main() -> None:
   style = f"force_style='BackColour=&H80000000,BorderStyle=4,Fontsize=16,FontName=Roboto'"
   
   # Mix clip with subtitles
-  os.popen(f"ffmpeg -y -i {dirname}/table/clip{ext} -filter_complex \
+  popen(f"ffmpeg -y -i {dirname}/table/clip{ext} -filter_complex \
   \"subtitles={dirname}/table/subtitles.srt:fontsdir={dirname}/fonts:{style}\" \
   -ss 0 -t {duration} {dirname}/output/{name}_{now}{ext}").read() 
   
-  time_end = time.time()
+  time_end = time()
   diff = int(time_end - time_start)
   print(f"\nDone in {diff} seconds.")
   
