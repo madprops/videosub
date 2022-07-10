@@ -93,7 +93,7 @@ def main() -> None:
   ext = Path(video_path).suffix
   
   # Create slice from original video
-  os.popen(f"ffmpeg -y -ss {start} -t {duration} -i '{video_path}' -c copy {dirname}/table/clip{ext}").read()
+  os.popen(f"ffmpeg -y -stream_loop -1 -ss {start} -t {duration} -i '{video_path}' -c copy {dirname}/table/clip{ext}").read()
   
   # Unix seconds
   now = int(datetime.now().timestamp())
@@ -102,9 +102,9 @@ def main() -> None:
   style = f"force_style='BackColour=&H80000000,BorderStyle=4,Fontsize=16,FontName=Roboto'"
   
   # Mix clip with subtitles
-  os.popen(f"ffmpeg -y -stream_loop -1 -i {dirname}/table/clip{ext} -filter_complex \
+  os.popen(f"ffmpeg -y -i {dirname}/table/clip{ext} -filter_complex \
   \"subtitles={dirname}/table/subtitles.srt:fontsdir={dirname}/fonts:{style}\" \
-  -ss 0 -t {duration} {dirname}/table/out_{now}{ext}").read() 
+  -ss 0 -t {duration} {dirname}/output/out_{now}{ext}").read() 
   
   time_end = time.time()
   diff = int(time_end - time_start)

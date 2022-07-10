@@ -10,6 +10,8 @@ It will then create a slice of the video.
 
 Then add the subtitles to the slice.
 
-The output video is saved in /table.
+Temporary files are stored in /table
+
+The output videos are saved in /output.
 
 (It relies on ffmpeg and the srt python library)
