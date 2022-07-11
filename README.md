@@ -1,5 +1,9 @@
 Send it a video path and a path of a text file with some lines.
 
+A third argument can be provided (start seconds, 0 to start at the beginning).
+
+Else it uses a random start location.
+
 It will generate the subtitles .srt file.
 
 Each line will add a bit to the duration depending on its length.
