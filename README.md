@@ -1,10 +1,10 @@
 Send it a video path and a path of a text file with some lines.
 
-A third argument can be provided (start seconds, 0 to start at the beginning).
+--start can be provided (start seconds, 0 to start at the beginning).
 
 Else it uses a random start location.
 
-A fourth argument with the duration can be provided.
+--duration can be provided.
 
 Else it lasts till the end of the subtitles, looping if necessary.
 
