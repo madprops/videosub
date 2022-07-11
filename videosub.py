@@ -16,7 +16,7 @@ dirname: str
 sub_gap = 0.5
 
 # Higher = Longer subtitle item duration
-sub_weight = 0.088
+sub_weight = 0.066
 
 # Remove unecessary characters
 def clean_path(path: str) -> str:
@@ -119,16 +119,9 @@ def main() -> None:
   # Get subtitles duration
   duration = get_sub_duration(sub_lines)
 
-  if duration >= max_duration:
-    print("Video is too short.")
-    exit(1)
-
   if len(sys.argv) > 3:
     # If start seconds supplied
     start = int(sys.argv[3])
-    if start + duration >= max_duration:
-      print("Start position has to be shorter.")
-      exit(1)
   else:
     # Get a random start seconds
     start = random.randint(0, max(0, max_duration - duration - 1))
@@ -155,7 +148,7 @@ def main() -> None:
   ffmpeg_cmd = "ffmpeg -hide_banner -loglevel error -y"
 
   # Mix clip with subtitles
-  os.popen(f"{ffmpeg_cmd} -i '{video_path}' -filter_complex \
+  os.popen(f"{ffmpeg_cmd} -stream_loop -1 -i '{video_path}' -filter_complex \
   \"subtitles={dirname}/table/subtitles.srt:fontsdir={dirname}/fonts:{style}\" \
   -ss {start} -t {duration} {dirname}/output/{name}_{now}{ext}").read() 
   
