@@ -13,6 +13,15 @@ from datetime import datetime, timedelta
 # Path where there script is
 dirname: str
 
+# Path if the video file
+video_path: str
+
+# Start seconds of the video
+start: int
+
+# Duration in seconds of the video
+duration: int
+
 # Seconds used between subtitle items
 sub_gap = 0.5
 
@@ -43,7 +52,7 @@ def get_sub_duration(lines) -> int:
   return int(math.ceil(seconds))  
 
 # Create the srt subtitles file
-def make_subtitles(lines, start) -> None:
+def make_subtitles(lines) -> None:
   # Starting seconds
   seconds = start + sub_gap
 
@@ -80,6 +89,31 @@ def make_subtitles(lines, start) -> None:
   f.write("\n".join(items))
   f.close()
 
+# Burn subtitles into the video
+def make_video():
+  # Get file extension
+  ext = Path(video_path).suffix
+  
+  # Unix seconds
+  now = int(datetime.now().timestamp())
+
+  # Get the output name
+  name = "".join(filter(str.isalnum, Path(video_path).stem))[0:10] or "output"
+
+  # Subtitles style
+  style = f"force_style='BackColour=&H80000000,BorderStyle=4,Fontsize=16,FontName=Roboto'"
+  
+  # Start of ffmpeg command
+  ffmpeg_cmd = "ffmpeg -hide_banner -loglevel error -y"
+
+  try:
+    # Mix clip with subtitles
+    os.popen(f"{ffmpeg_cmd} -stream_loop -1 -i '{video_path}' -filter_complex \
+    \"subtitles={dirname}/table/subtitles.srt:fontsdir={dirname}/fonts:{style}\" \
+    -ss {start} -t {duration} {dirname}/output/{name}_{now}{ext}").read()
+  except:
+    exit(0)
+
 # Get video duration
 def get_video_duration(path: str) -> int:
   d = check_output(['ffprobe', '-i', path, '-show_entries', \
@@ -90,6 +124,9 @@ def get_video_duration(path: str) -> int:
 # Main function
 def main() -> None:
   global dirname
+  global video_path
+  global start
+  global duration
 
   # Argument parser
   argparser = argparse.ArgumentParser(description="Add subtitles to a video")
@@ -100,10 +137,10 @@ def main() -> None:
   argparser.add_argument("textpath", type=str, nargs=1,
   help="Path to a text file")
 
-  argparser.add_argument("start", type=int, nargs="?", default=-1,
+  argparser.add_argument("--start", type=int, nargs="?", default=-1,
   help="Start of the video")
 
-  argparser.add_argument("duration", type=int, nargs="?", default=-1,
+  argparser.add_argument("--duration", type=int, nargs="?", default=-1,
   help="Duration of the video")                                          
 
   args = argparser.parse_args()
@@ -144,35 +181,15 @@ def main() -> None:
     # If start seconds supplied
     start = args.start
 
-  # Generate subtitles
-  make_subtitles(sub_lines, start)    
-
   print(f"Start: {start} seconds")
-  print(f"Duration: {duration} seconds")
+  print(f"Duration: {duration} seconds")    
 
-  # Get file extension
-  ext = Path(video_path).suffix
-  
-  # Unix seconds
-  now = int(datetime.now().timestamp())
+  # Make subtitles file
+  make_subtitles(sub_lines)    
 
-  # Get the output name
-  name = "".join(filter(str.isalnum, Path(video_path).stem))[0:10] or "output"
+  # Make the video
+  make_video()
 
-  # Subtitles style
-  style = f"force_style='BackColour=&H80000000,BorderStyle=4,Fontsize=16,FontName=Roboto'"
-  
-  # Start of ffmpeg command
-  ffmpeg_cmd = "ffmpeg -hide_banner -loglevel error -y"
-
-  try:
-    # Mix clip with subtitles
-    os.popen(f"{ffmpeg_cmd} -stream_loop -1 -i '{video_path}' -filter_complex \
-    \"subtitles={dirname}/table/subtitles.srt:fontsdir={dirname}/fonts:{style}\" \
-    -ss {start} -t {duration} {dirname}/output/{name}_{now}{ext}").read()
-  except:
-    exit(0)
-  
   # End message
   time_end = time.time()
   diff = int(time_end - time_start)
