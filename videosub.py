@@ -15,7 +15,7 @@ dirname: str
 # Seconds used between subtitle items
 sub_gap = 0.5
 
-# Higher = Longer item duration
+# Higher = Longer subtitle item duration
 sub_weight = 0.088
 
 # Remove unecessary characters
@@ -32,7 +32,7 @@ def srt_timestamp(td) -> str:
 
 # Get subtitles duration
 def get_sub_duration(lines) -> int:
-  seconds = 0
+  seconds = sub_gap
   
   for i, line in enumerate(lines):
     seconds += max(len(line) * sub_weight, 1) 
