@@ -5,6 +5,7 @@ import sys
 import random
 import math
 import time
+import argparse
 from pathlib import Path
 from subprocess import check_output
 from datetime import datetime, timedelta
@@ -90,12 +91,26 @@ def get_video_duration(path: str) -> int:
 def main() -> None:
   global dirname
 
-  if len(sys.argv) < 3:
-    return
+  # Argument parser
+  argparser = argparse.ArgumentParser(description="Add subtitles to a video")
+
+  argparser.add_argument("videopath", type=str, nargs=1,
+  help="Path to a video file")
+
+  argparser.add_argument("textpath", type=str, nargs=1,
+  help="Path to a text file")
+
+  argparser.add_argument("start", type=int, nargs="?", default=-1,
+  help="Start of the video")
+
+  argparser.add_argument("duration", type=int, nargs="?", default=-1,
+  help="Duration of the video")                                          
+
+  args = argparser.parse_args()
 
   # Arguments
-  video_path = sys.argv[1]
-  text_path = sys.argv[2]
+  video_path = args.videopath[0]
+  text_path = args.textpath[0]
 
   dirname = clean_path(os.path.dirname(os.path.realpath(__file__)))
 
@@ -116,15 +131,18 @@ def main() -> None:
   # Check original video duration
   max_duration = get_video_duration(video_path)
 
-  # Get subtitles duration
-  duration = get_sub_duration(sub_lines)
-
-  if len(sys.argv) > 3:
-    # If start seconds supplied
-    start = int(sys.argv[3])
+  if args.duration == -1:
+    # Get subtitles duration
+    duration = get_sub_duration(sub_lines)
   else:
+    duration = args.duration
+
+  if args.start == -1:
     # Get a random start seconds
     start = random.randint(0, max(0, max_duration - duration - 1))
+  else:
+    # If start seconds supplied
+    start = args.start
 
   # Generate subtitles
   make_subtitles(sub_lines, start)    
@@ -147,10 +165,13 @@ def main() -> None:
   # Start of ffmpeg command
   ffmpeg_cmd = "ffmpeg -hide_banner -loglevel error -y"
 
-  # Mix clip with subtitles
-  os.popen(f"{ffmpeg_cmd} -stream_loop -1 -i '{video_path}' -filter_complex \
-  \"subtitles={dirname}/table/subtitles.srt:fontsdir={dirname}/fonts:{style}\" \
-  -ss {start} -t {duration} {dirname}/output/{name}_{now}{ext}").read() 
+  try:
+    # Mix clip with subtitles
+    os.popen(f"{ffmpeg_cmd} -stream_loop -1 -i '{video_path}' -filter_complex \
+    \"subtitles={dirname}/table/subtitles.srt:fontsdir={dirname}/fonts:{style}\" \
+    -ss {start} -t {duration} {dirname}/output/{name}_{now}{ext}").read()
+  except:
+    exit(0)
   
   # End message
   time_end = time.time()
