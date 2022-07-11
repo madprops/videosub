@@ -4,6 +4,10 @@ A third argument can be provided (start seconds, 0 to start at the beginning).
 
 Else it uses a random start location.
 
+A fourth argument with the duration can be provided.
+
+Else it lasts till the end of the subtitles, looping if necessary.
+
 It will generate the subtitles .srt file.
 
 Each line will add a bit to the duration depending on its length.
