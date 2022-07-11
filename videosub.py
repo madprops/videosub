@@ -149,6 +149,7 @@ def main() -> None:
   video_path = args.videopath[0]
   text_path = args.textpath[0]
 
+  # Path where the script is located to save files
   dirname = clean_path(os.path.dirname(os.path.realpath(__file__)))
 
   if not Path(video_path).exists():
