@@ -18,7 +18,7 @@ It will then create a slice of the video.
 
 Then add the subtitles to the slice.
 
-Temporary files are stored in /table
+Temporary files are stored in /table.
 
 The output videos are saved in /output.
 
