@@ -43,13 +43,13 @@ def srt_timestamp(td) -> str:
 # Get subtitles duration
 def get_sub_duration(lines) -> int:
   seconds = sub_gap
-  
-  for i, line in enumerate(lines):
-    seconds += max(len(line) * sub_weight, 1) 
-    if i < len(lines) - 1:
-      seconds += sub_gap       
 
-  return int(math.ceil(seconds))  
+  for i, line in enumerate(lines):
+    seconds += max(len(line) * sub_weight, 1)
+    if i < len(lines) - 1:
+      seconds += sub_gap
+
+  return int(math.ceil(seconds))
 
 # Create the srt subtitles file
 def make_subtitles(lines) -> None:
@@ -69,21 +69,21 @@ def make_subtitles(lines) -> None:
     text += srt_timestamp(timedelta(seconds=seconds))
     text += " --> "
     text += srt_timestamp(timedelta(seconds=seconds + line_duration))
-    
+
     # Text content
     text += f"\n{line}"
 
     # Add to list to join later
     items.append(text)
-    
+
     # Increase seconds used
     seconds += line_duration
-    
+
     # Add a gap between lines
     # Unless it's the last item
     if i < len(lines) - 1:
       seconds += sub_gap
-  
+
   # Save srt file to table
   f = open(f"{dirname}/table/subtitles.srt", "w")
   f.write("\n".join(items))
@@ -93,7 +93,7 @@ def make_subtitles(lines) -> None:
 def make_video():
   # Get file extension
   ext = Path(video_path).suffix
-  
+
   # Unix seconds
   now = int(datetime.now().timestamp())
 
@@ -102,7 +102,7 @@ def make_video():
 
   # Subtitles style
   style = f"force_style='BackColour=&H80000000,BorderStyle=4,Fontsize=16,FontName=Roboto'"
-  
+
   # Start of ffmpeg command
   ffmpeg_cmd = "ffmpeg -hide_banner -loglevel error -y"
 
@@ -119,7 +119,7 @@ def get_video_duration(path: str) -> int:
   d = check_output(['ffprobe', '-i', path, '-show_entries', \
   'format=duration', '-v', 'quiet', '-of', 'csv=%s' % ("p=0")])
   d = d.decode("utf-8").strip()
-  return int(float(d))  
+  return int(float(d))
 
 # Main function
 def main() -> None:
@@ -141,7 +141,7 @@ def main() -> None:
   help="Start of the video (seconds)")
 
   argparser.add_argument("--duration", type=int, nargs="?", default=-1,
-  help="Duration of the video (seconds)")                                          
+  help="Duration of the video (seconds)")
 
   args = argparser.parse_args()
 
@@ -159,7 +159,7 @@ def main() -> None:
   if not Path(text_path).exists():
     print("Invalid text path.")
     exit(1)
-  
+
   # To calculate performance
   time_start = time.time()
 
@@ -183,10 +183,10 @@ def main() -> None:
     start = args.start
 
   print(f"Start: {start} seconds")
-  print(f"Duration: {duration} seconds")    
+  print(f"Duration: {duration} seconds")
 
   # Make subtitles file
-  make_subtitles(sub_lines)    
+  make_subtitles(sub_lines)
 
   # Make the video
   make_video()
@@ -195,6 +195,6 @@ def main() -> None:
   time_end = time.time()
   diff = int(time_end - time_start)
   print(f"Done in {diff} seconds")
-  
+
 # Program starts here
 if __name__ == "__main__": main()
