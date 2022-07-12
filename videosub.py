@@ -138,10 +138,10 @@ def main() -> None:
   help="Path to a text file")
 
   argparser.add_argument("--start", type=int, nargs="?", default=-1,
-  help="Start of the video")
+  help="Start of the video (seconds)")
 
   argparser.add_argument("--duration", type=int, nargs="?", default=-1,
-  help="Duration of the video")                                          
+  help="Duration of the video (seconds)")                                          
 
   args = argparser.parse_args()
 
