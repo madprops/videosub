@@ -25,8 +25,8 @@ duration: int
 # Seconds used between subtitle items
 sub_gap = 0.5
 
-# Higher = Longer subtitle item duration
-sub_weight = 0.066
+# Higher = Longer subtitle item duration (in ms)
+sub_weight: int
 
 # Remove unecessary characters
 def clean_path(path: str) -> str:
@@ -43,9 +43,10 @@ def srt_timestamp(td) -> str:
 # Get subtitles duration
 def get_sub_duration(lines) -> int:
   seconds = sub_gap
+  ms = sub_weight / 1000
 
   for i, line in enumerate(lines):
-    seconds += max(len(line) * sub_weight, 1)
+    seconds += max(len(line) * ms, 1)
     if i < len(lines) - 1:
       seconds += sub_gap
 
@@ -55,6 +56,7 @@ def get_sub_duration(lines) -> int:
 def make_subtitles(lines) -> None:
   # Starting seconds
   seconds = start + sub_gap
+  ms = sub_weight / 1000
 
   items = []
   subs = []
@@ -63,7 +65,7 @@ def make_subtitles(lines) -> None:
     text = f"{i + 1}\n"
 
     # Line duration based on char length
-    line_duration = max(len(line) * sub_weight, 1)
+    line_duration = max(len(line) * ms, 1)
 
     # Start and end timestamps
     text += srt_timestamp(timedelta(seconds=seconds))
@@ -127,6 +129,7 @@ def main() -> None:
   global video_path
   global start
   global duration
+  global sub_weight
 
   # Argument parser
   argparser = argparse.ArgumentParser(description="Add subtitles to a video")
@@ -143,11 +146,15 @@ def main() -> None:
   argparser.add_argument("--duration", type=int, nargs="?", default=-1,
   help="Duration of the video (seconds)")
 
+  argparser.add_argument("--weight", type=int, nargs="?", default=66,
+  help="How much seconds per character")
+
   args = argparser.parse_args()
 
   # Arguments
   video_path = args.videopath[0]
   text_path = args.textpath[0]
+  sub_weight = args.weight
 
   # Path where the script is located to save files
   dirname = clean_path(os.path.dirname(os.path.realpath(__file__)))
@@ -184,6 +191,7 @@ def main() -> None:
 
   print(f"Start: {start} seconds")
   print(f"Duration: {duration} seconds")
+  print(f"Weight: {sub_weight} milliseconds")
 
   # Make subtitles file
   make_subtitles(sub_lines)
