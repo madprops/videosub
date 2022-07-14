@@ -147,7 +147,7 @@ def main() -> None:
   help="Duration of the video (seconds)")
 
   argparser.add_argument("--weight", type=int, nargs="?", default=66,
-  help="How much seconds per character")
+  help="How many milliseconds per character")
 
   args = argparser.parse_args()
 
